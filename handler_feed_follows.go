@@ -9,12 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerAddFollow(s *state, cmd command) error {
-	u, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("couldn't find user: %s, error: %w", s.cfg.CurrentUserName, err)
-	}
-
+func handlerAddFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) != 1 {
 		return fmt.Errorf("usage: %s <feed_url>", cmd.Name)
 	}
@@ -28,7 +23,7 @@ func handlerAddFollow(s *state, cmd command) error {
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
-		UserID:    u.ID,
+		UserID:    user.ID,
 		FeedID:    dbFeed.ID,
 	})
 	if err != nil {
@@ -41,15 +36,10 @@ func handlerAddFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerListFeedFollows(s *state, cmd command) error {
-	u, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+func handlerListFeedFollows(s *state, cmd command, user database.User) error {
+	followedByUser, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
-		return fmt.Errorf("couldn't find user: %s, error: %w", s.cfg.CurrentUserName, err)
-	}
-
-	followedByUser, err := s.db.GetFeedFollowsForUser(context.Background(), u.ID)
-	if err != nil {
-		return fmt.Errorf("error retrieving user `%s` follows: %w", u.Name, err)
+		return fmt.Errorf("error retrieving user `%s` follows: %w", user.Name, err)
 	}
 	fmt.Println("DEBUG: ")
 	fmt.Printf("currentUserName: %s ", s.cfg.CurrentUserName)
@@ -58,7 +48,7 @@ func handlerListFeedFollows(s *state, cmd command) error {
 		return nil
 	}
 
-	fmt.Printf("Feed follows for user %s:\n", u.Name)
+	fmt.Printf("Feed follows for user %s:\n", user.Name)
 	for _, ff := range followedByUser {
 		fmt.Printf("* %s\n", ff.FeedName)
 	}
