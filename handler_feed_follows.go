@@ -9,6 +9,24 @@ import (
 	"github.com/google/uuid"
 )
 
+func handlerRemoveFollow(s *state, cmd command, user database.User) error {
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("usage: %s <feed_url>", cmd.Name)
+	}
+
+	err := s.db.DeleteFollowRecordByUserAndFeedUrl(context.Background(), database.DeleteFollowRecordByUserAndFeedUrlParams{
+		UserID: user.ID,
+		Url:    cmd.Args[0],
+	})
+
+	if err != nil {
+		return fmt.Errorf("error trying to remove follow: %w", err)
+	}
+
+	fmt.Println("Follow removed successfully")
+	return nil
+}
+
 func handlerAddFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) != 1 {
 		return fmt.Errorf("usage: %s <feed_url>", cmd.Name)

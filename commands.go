@@ -20,7 +20,7 @@ func (c *commands) register(name string, f func(*state, command) error) {
 func (c *commands) run(s *state, cmd command) error {
 	f, ok := c.registeredCommands[cmd.Name]
 	if !ok {
-		return fmt.Errorf("command <%v> not found", cmd.Name)
+		return fmt.Errorf("command '%v' not found", cmd.Name)
 	}
 	return f(s, cmd)
 }
