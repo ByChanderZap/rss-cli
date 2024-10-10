@@ -13,3 +13,6 @@ RETURNING *;
 SELECT * 
 FROM users u
 WHERE u.name = $1;
+
+-- name: DeleteAllUsers :exec
+DELETE FROM users;
