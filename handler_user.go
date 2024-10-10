@@ -35,12 +35,12 @@ func handlerListUsers(s *state, _ command) error {
 		return fmt.Errorf("couldn't get users: %w", err)
 	}
 	for _, u := range users {
-		// * lane
 		if u.Name == s.cfg.CurrentUserName {
-			fmt.Printf(" * %s (current)\n", u.Name)
-		} else {
-			fmt.Printf(" * %s\n", u.Name)
+			fmt.Printf(" * %v (current)\n", u.Name)
+			continue
 		}
+		fmt.Printf(" * %v\n", u.Name)
+
 	}
 	return nil
 }
